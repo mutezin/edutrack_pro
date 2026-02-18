@@ -1,0 +1,21 @@
+{
+  "name": "edutrack-pro",
+  "version": "1.0.0",
+  "description": "EduTrack Pro - Educational Management System",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "build:server": "npm --prefix server",
+    "install": "npm install --prefix server && npm install --prefix client",
+    "start": "npm start --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "keywords": ["education", "management"],
+  "author": "",
+  "license": "MIT"
+}
