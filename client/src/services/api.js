@@ -87,4 +87,10 @@ export const dashboardAPI = {
   getStats: () => apiClient.get('/dashboard/stats')
 };
 
+// Parent API
+export const parentAPI = {
+  // GET /api/parents/:parentId/dashboard
+  getDashboard: (parentId) => apiClient.get(`/parents/${parentId}/dashboard`)
+};
+
 export default apiClient;

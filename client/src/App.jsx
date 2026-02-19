@@ -6,6 +6,7 @@ import AuthLogin from './pages/AuthLogin';
 import AuthSignup from './pages/AuthSignup';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import ParentDashboard from './pages/ParentDashboard';
 import Students from './pages/Students';
 import Teachers from './pages/Teachers';
 import Reports from './pages/Reports';
@@ -30,6 +31,7 @@ function AppLayout() {
         <main className="flex-1 overflow-y-auto">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/parent" element={<ParentDashboard />} />
             <Route path="/students" element={<Students />} />
             <Route path="/teachers" element={<Teachers />} />
             <Route path="/performance" element={<Performance />} />

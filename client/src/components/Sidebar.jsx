@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, BarChart3, Users, TrendingUp, AlertCircle, Activity, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 function Sidebar({ onLogout }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
 
-  const menuItems = [
+  // Dynamic menu items based on user role
+  const baseMenuItems = [
     { id: 'dashboard', label: 'Dashboard', path: '/', icon: BarChart3 },
     { id: 'students', label: 'Students', path: '/students', icon: Users },
     { id: 'teachers', label: 'Teachers', path: '/teachers', icon: Users },
@@ -14,6 +17,19 @@ function Sidebar({ onLogout }) {
     { id: 'alerts', label: 'Alerts', path: '/alerts', icon: AlertCircle },
     { id: 'reports', label: 'Reports', path: '/reports', icon: TrendingUp }
   ];
+
+  const menuItems = useMemo(() => {
+    if (user?.role === 'parent') {
+      // For parents, update dashboard path and hide some items
+      return baseMenuItems.map(item => {
+        if (item.id === 'dashboard') {
+          return { ...item, path: '/parent' };
+        }
+        return item;
+      }).filter(item => !['students', 'teachers'].includes(item.id));
+    }
+    return baseMenuItems;
+  }, [user?.role]);
 
   const isActive = (path) => location.pathname === path;
 

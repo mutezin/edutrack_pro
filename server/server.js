@@ -8,6 +8,7 @@ const studentRoutes = require('./routes/studentRoutes');
 const teacherRoutes = require('./routes/teacherRoutes');
 const performanceRoutes = require('./routes/performanceRoutes');
 const alertRoutes = require('./routes/alertRoutes');
+const parentRoutes = require('./routes/parentRoutes');
 const authRoutes = require('./routes/authRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 const initDatabase = require('./utils/initDatabase');
@@ -33,6 +34,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/teachers', teacherRoutes);
 app.use('/api/performance', performanceRoutes);
 app.use('/api/alerts', alertRoutes);
+app.use('/api/parents', parentRoutes);
 
 // 404 handler
 app.use((req, res) => {
