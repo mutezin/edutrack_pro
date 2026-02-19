@@ -1,71 +1,74 @@
-const pool = require('../config/database');
+const Student = require('../models/Student');
 
 // Get all students
-const getStudents = async (req, res) => {
+const getStudents = async (req, res, next) => {
   try {
-    const connection = await pool.getConnection();
-    const [rows] = await connection.query('SELECT * FROM students');
-    connection.release();
-    res.json(rows);
+    const students = await Student.findAll();
+    res.json(students);
   } catch (error) {
     console.error('Error fetching students:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 };
 
 // Get student by ID
-const getStudentById = async (req, res) => {
+const getStudentById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const connection = await pool.getConnection();
-    const [rows] = await connection.query('SELECT * FROM students WHERE id = ?', [id]);
-    connection.release();
+    const student = await Student.findById(id);
     
-    if (rows.length === 0) {
+    if (!student) {
       return res.status(404).json({ error: 'Student not found' });
     }
-    res.json(rows[0]);
+    res.json(student);
   } catch (error) {
     console.error('Error fetching student:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 };
 
 // Create a new student
-const createStudent = async (req, res) => {
+const createStudent = async (req, res, next) => {
   try {
     const { name, email, roll_number, class: studentClass } = req.body;
-    const connection = await pool.getConnection();
-    
-    const result = await connection.query(
-      'INSERT INTO students (name, email, roll_number, class) VALUES (?, ?, ?, ?)',
-      [name, email, roll_number, studentClass]
-    );
-    
-    connection.release();
-    res.status(201).json({ id: result[0].insertId, name, email, roll_number, class: studentClass });
+    const student = await Student.create({ name, email, roll_number, class: studentClass });
+    res.status(201).json(student);
   } catch (error) {
     console.error('Error creating student:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
+  }
+};
+
+// Update a student
+const updateStudent = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, email, roll_number, class: studentClass } = req.body;
+    const student = await Student.update(id, { name, email, roll_number, class: studentClass });
+    
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+    res.json(student);
+  } catch (error) {
+    console.error('Error updating student:', error);
+    next(error);
   }
 };
 
 // Delete a student
-const deleteStudent = async (req, res) => {
+const deleteStudent = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const connection = await pool.getConnection();
+    const deleted = await Student.delete(id);
     
-    const result = await connection.query('DELETE FROM students WHERE id = ?', [id]);
-    connection.release();
-    
-    if (result[0].affectedRows === 0) {
+    if (!deleted) {
       return res.status(404).json({ error: 'Student not found' });
     }
     res.json({ message: 'Student deleted successfully' });
   } catch (error) {
     console.error('Error deleting student:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    next(error);
   }
 };
 
@@ -73,5 +76,6 @@ module.exports = {
   getStudents,
   getStudentById,
   createStudent,
+  updateStudent,
   deleteStudent
 };

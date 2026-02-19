@@ -1,6 +1,7 @@
 import React from 'react';
+import { Edit2, Trash2 } from 'lucide-react';
 
-function TeacherTable({ teachers, onDelete }) {
+function TeacherTable({ teachers, onDelete, onEdit, isLoading }) {
   if (teachers.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -18,7 +19,7 @@ function TeacherTable({ teachers, onDelete }) {
             <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Subject</th>
             <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Department</th>
-            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+            <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -28,11 +29,21 @@ function TeacherTable({ teachers, onDelete }) {
               <td className="px-6 py-4 text-sm text-gray-600">{teacher.email}</td>
               <td className="px-6 py-4 text-sm text-gray-600">{teacher.subject}</td>
               <td className="px-6 py-4 text-sm text-gray-600">{teacher.department}</td>
-              <td className="px-6 py-4 text-sm">
+              <td className="px-6 py-4 text-sm flex gap-2">
+                <button
+                  onClick={() => onEdit(teacher)}
+                  disabled={isLoading}
+                  className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition inline-flex items-center gap-1 disabled:opacity-50"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Edit
+                </button>
                 <button
                   onClick={() => onDelete(teacher.id)}
-                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                  disabled={isLoading === teacher.id}
+                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition inline-flex items-center gap-1 disabled:opacity-50"
                 >
+                  <Trash2 className="w-4 h-4" />
                   Delete
                 </button>
               </td>

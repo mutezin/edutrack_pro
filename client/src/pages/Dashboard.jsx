@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { dashboardAPI } from '../services/api';
 import StatCard from '../components/StatCard';
 import PerformanceTrends from '../components/PerformanceTrends';
 import SystemFeed from '../components/SystemFeed';
@@ -7,12 +7,13 @@ import { BarChart3, Users, AlertCircle, TrendingUp } from 'lucide-react';
 
 function Dashboard() {
   const [stats, setStats] = useState({
-    totalStudents: 19480,
-    totalTeachers: 842,
-    activeAlerts: 12,
-    avgPerformance: 88.5
+    totalStudents: 0,
+    totalTeachers: 0,
+    activeAlerts: 0,
+    avgPerformance: 0
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
@@ -27,10 +28,12 @@ function Dashboard() {
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/dashboard/stats');
+      setError(null);
+      const response = await dashboardAPI.getStats();
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching stats:', error);
+      setError('Failed to load dashboard statistics');
     } finally {
       setLoading(false);
     }

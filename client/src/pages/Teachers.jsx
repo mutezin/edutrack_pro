@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { teacherAPI } from '../services/api';
 import TeacherForm from '../components/TeacherForm';
 import TeacherTable from '../components/TeacherTable';
 import { Plus } from 'lucide-react';
@@ -7,8 +7,11 @@ import { Plus } from 'lucide-react';
 function Teachers() {
   const [teachers, setTeachers] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [actionLoading, setActionLoading] = useState(null);
 
   useEffect(() => {
     fetchTeachers();
@@ -16,36 +19,57 @@ function Teachers() {
 
   const fetchTeachers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/teachers');
+      setLoading(true);
+      setError(null);
+      const response = await teacherAPI.getAll();
       setTeachers(response.data);
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching teachers:', error);
+      setError('Failed to load teachers');
+    } finally {
       setLoading(false);
     }
   };
 
   const handleAddTeacher = async (formData) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/teachers', formData);
-      setTeachers([...teachers, response.data]);
+      setActionLoading('add');
+      if (editingId) {
+        const response = await teacherAPI.update(editingId, formData);
+        setTeachers(teachers.map(t => t.id === editingId ? response.data : t));
+        setEditingId(null);
+        alert('Teacher updated successfully!');
+      } else {
+        const response = await teacherAPI.create(formData);
+        setTeachers([...teachers, response.data]);
+        alert('Teacher added successfully!');
+      }
       setShowForm(false);
-      alert('Teacher added successfully!');
     } catch (error) {
-      console.error('Error adding teacher:', error);
-      alert('Error adding teacher');
+      console.error('Error saving teacher:', error);
+      alert(error.response?.data?.error || 'Error saving teacher');
+    } finally {
+      setActionLoading(null);
     }
+  };
+
+  const handleEditTeacher = (teacher) => {
+    setEditingId(teacher.id);
+    setShowForm(true);
   };
 
   const handleDeleteTeacher = async (id) => {
     if (window.confirm('Are you sure you want to delete this teacher?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/teachers/${id}`);
+        setActionLoading(id);
+        await teacherAPI.delete(id);
         setTeachers(teachers.filter(t => t.id !== id));
         alert('Teacher deleted successfully!');
       } catch (error) {
         console.error('Error deleting teacher:', error);
-        alert('Error deleting teacher');
+        alert(error.response?.data?.error || 'Error deleting teacher');
+      } finally {
+        setActionLoading(null);
       }
     }
   };
@@ -54,6 +78,8 @@ function Teachers() {
     teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     teacher.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const editingTeacher = editingId ? teachers.find(t => t.id === editingId) : null;
 
   if (loading) {
     return <div className="p-8 text-center text-gray-600">Loading teachers...</div>;
@@ -67,18 +93,33 @@ function Teachers() {
           <p className="text-gray-600 mt-1">Manage and track all teacher information</p>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+          onClick={() => {
+            setEditingId(null);
+            setShowForm(!showForm);
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:opacity-50"
+          disabled={actionLoading}
         >
           <Plus className="w-5 h-5" />
           Add Teacher
         </button>
       </div>
 
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+
       {showForm && (
         <TeacherForm
+          initialData={editingTeacher}
           onSubmit={handleAddTeacher}
-          onCancel={() => setShowForm(false)}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingId(null);
+          }}
+          isLoading={actionLoading === 'add'}
         />
       )}
 
@@ -93,14 +134,20 @@ function Teachers() {
               placeholder="Search teachers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           </div>
         </div>
-        <TeacherTable teachers={filteredTeachers} onDelete={handleDeleteTeacher} />
+        <TeacherTable 
+          teachers={filteredTeachers} 
+          onDelete={handleDeleteTeacher}
+          onEdit={handleEditTeacher}
+          isLoading={actionLoading}
+        />
       </div>
     </div>
   );
 }
 
 export default Teachers;
+

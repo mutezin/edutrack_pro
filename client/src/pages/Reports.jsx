@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { dashboardAPI } from '../services/api';
 
 function Reports() {
   const [reportData, setReportData] = useState({
@@ -9,6 +9,7 @@ function Reports() {
     activeAlerts: 0
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchReportData();
@@ -16,17 +17,24 @@ function Reports() {
 
   const fetchReportData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/dashboard/stats');
+      setLoading(true);
+      setError(null);
+      const response = await dashboardAPI.getStats();
       setReportData(response.data);
-      setLoading(false);
     } catch (error) {
       console.error('Error fetching report data:', error);
+      setError('Failed to load report data');
+    } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
     return <div className="p-8 text-center">Loading reports...</div>;
+  }
+
+  if (error) {
+    return <div className="p-8 text-center text-red-600">{error}</div>;
   }
 
   return (

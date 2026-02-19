@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
-import { Menu, X, Search, Bell, User, LogOut, BarChart3, Users, AlertCircle, TrendingUp } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X, BarChart3, Users, TrendingUp, AlertCircle, Activity, LogOut } from 'lucide-react';
 
-function Sidebar({ userType, onLogout, activeMenu, setActiveMenu }) {
+function Sidebar({ onLogout }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const location = useLocation();
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { id: 'students', label: 'Students', icon: Users },
-    { id: 'teachers', label: 'Teachers', icon: Users },
-    { id: 'reports', label: 'Reports', icon: TrendingUp },
-    { id: 'settings', label: 'Settings', icon: AlertCircle }
+    { id: 'dashboard', label: 'Dashboard', path: '/', icon: BarChart3 },
+    { id: 'students', label: 'Students', path: '/students', icon: Users },
+    { id: 'teachers', label: 'Teachers', path: '/teachers', icon: Users },
+    { id: 'performance', label: 'Performance', path: '/performance', icon: Activity },
+    { id: 'alerts', label: 'Alerts', path: '/alerts', icon: AlertCircle },
+    { id: 'reports', label: 'Reports', path: '/reports', icon: TrendingUp }
   ];
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <>
@@ -41,31 +46,31 @@ function Sidebar({ userType, onLogout, activeMenu, setActiveMenu }) {
         <nav className="space-y-2 mb-8">
           {menuItems.map(item => {
             const Icon = item.icon;
+            const active = isActive(item.path);
             return (
-              <button
+              <Link
                 key={item.id}
-                onClick={() => {
-                  setActiveMenu(item.id);
-                  setIsMobileOpen(false);
-                }}
+                to={item.path}
+                onClick={() => setIsMobileOpen(false)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                  activeMenu === item.id
+                  active
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 <Icon className="w-5 h-5" />
                 <span className="text-sm font-medium">{item.label}</span>
-              </button>
+              </Link>
             );
           })}
         </nav>
 
         <div className="pt-6 border-t">
-          <p className="text-xs text-gray-500 mb-3">USER TYPE</p>
-          <p className="text-sm font-semibold text-gray-800 mb-4">{userType}</p>
           <button
-            onClick={onLogout}
+            onClick={() => {
+              onLogout();
+              setIsMobileOpen(false);
+            }}
             className="w-full flex items-center gap-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition text-sm font-medium"
           >
             <LogOut className="w-5 h-5" />
