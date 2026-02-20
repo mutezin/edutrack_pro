@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { parentAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { AlertCircle, CheckCircle, FileText, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function ParentDashboard() {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ function ParentDashboard() {
   useEffect(() => {
     fetchParentDashboard();
   }, [user?.id]);
+  const navigate = useNavigate();
 
   const fetchParentDashboard = async () => {
     try {
@@ -88,7 +90,10 @@ function ParentDashboard() {
                 <p className="text-lg font-semibold text-green-600">{data.attendance}%</p>
               </div>
               <div>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+                <button
+                  onClick={() => navigate(`/parent/report?childId=${child.id}`)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
+                >
                   View Full Report
                 </button>
               </div>
@@ -242,7 +247,7 @@ function ParentDashboard() {
           </div>
 
           {/* Actions */}
-          <button className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50">
+          <button onClick={() => navigate('/alerts')} className="w-full mt-4 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50">
             View All Alerts
           </button>
         </div>
@@ -250,5 +255,4 @@ function ParentDashboard() {
     </div>
   );
 }
-
 export default ParentDashboard;
