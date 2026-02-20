@@ -93,4 +93,8 @@ export const parentAPI = {
   getDashboard: (parentId) => apiClient.get(`/parents/${parentId}/dashboard`)
 };
 
+// parent specific helpers
+parentAPI.getChildReport = (parentId, childId) => apiClient.get(`/parents/${parentId}/child/${childId}/report`);
+parentAPI.getDetailedAnalysis = (parentId, childId) => apiClient.get(`/parents/${parentId}/child/${childId}/analysis`);
+
 export default apiClient;

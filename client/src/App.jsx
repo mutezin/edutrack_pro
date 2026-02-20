@@ -7,6 +7,7 @@ import AuthSignup from './pages/AuthSignup';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ParentDashboard from './pages/ParentDashboard';
+import ParentReport from './pages/ParentReport';
 import Students from './pages/Students';
 import Teachers from './pages/Teachers';
 import Reports from './pages/Reports';
@@ -32,6 +33,7 @@ function AppLayout() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/parent" element={<ParentDashboard />} />
+            <Route path="/parent/report" element={<ParentReport />} />
             <Route path="/students" element={<Students />} />
             <Route path="/teachers" element={<Teachers />} />
             <Route path="/performance" element={<Performance />} />
