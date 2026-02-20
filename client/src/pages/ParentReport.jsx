@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { parentAPI } from '../services/api';
-import { Download, Mail, Print, ArrowLeft } from 'lucide-react';
+import { Download, Mail, Printer, ArrowLeft } from 'lucide-react';
 
 function ParentReport() {
   const { user } = useAuth();
@@ -96,7 +96,7 @@ function ParentReport() {
             onClick={handlePrint}
             className="px-4 py-2 bg-gray-600 text-white rounded-lg text-sm font-medium hover:bg-gray-700 flex items-center gap-2"
           >
-            <Print className="w-4 h-4" />
+            <Printer className="w-4 h-4" />
             Print
           </button>
           <button
